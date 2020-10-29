@@ -160,6 +160,7 @@ function renderListings(features) {
                 center: feature.geometry.coordinates,
                 zoom: 17
                 });
+              
             });
       listingEl.appendChild(item);
     });
@@ -170,7 +171,7 @@ function renderListings(features) {
     empty.textContent = 'No results found';
     listingEl.appendChild(empty);
   } else {
-    empty.textContent = 'Drag the map to populate results';
+    empty.textContent = 'Drag the map to populate Point of Interests (Should be enabled)';
     listingEl.appendChild(empty);
 
     // Hide the filter input
@@ -355,10 +356,11 @@ map.on('load', function() {
   });
   var link = document.createElement('a');
   link.href = '#';
-  link.className = 'active';
+  link.className = '';
   link.textContent = statusName2;
   var layers = document.getElementById('button');
   layers.appendChild(link);
+  map.setLayoutProperty(statusName2, 'visibility', 'none');
 
   link.onclick = function(e) {
     let clickedLayer = this.textContent;
@@ -389,6 +391,7 @@ map.on('load', function() {
 
   map.on('mouseleave', 'Train Stations', function() {
     map.getCanvas().style.cursor = '';
+    popup.remove();
   });
 
 
@@ -400,6 +403,7 @@ map.on('load', function() {
 
   map.on('mouseleave', 'Train Tracks', function() {
     map.getCanvas().style.cursor = '';
+     popup.remove();
   });
 
   //Hover for POIS
@@ -442,6 +446,20 @@ map.on('load', function() {
       .addTo(map);
   });
 
+//train stations on move of mouse
+
+map.on('mousemove', 'Train Stations', function(e) {
+    // Change the cursor style as a UI indicator.
+
+    // Populate the popup and set its coordinates based on the feature.
+    var feature = e.features[0];
+    popup
+      .setLngLat(feature.geometry.coordinates)
+      .setText(
+        'Station Name: ' + e.features[0].properties.STATIONNAM 
+      )
+      .addTo(map);
+  });
 
   //Train Tracks on click
 
@@ -453,6 +471,20 @@ map.on('load', function() {
       .addTo(map);
   });
 
+
+// Train tracks on move 
+map.on('mousemove', 'Train Tracks', function(e) {
+    // Change the cursor style as a UI indicator.
+
+    // Populate the popup and set its coordinates based on the feature.
+    var feature = e.features[0];
+    popup
+      .setLngLat(e.lngLat)
+      .setText(
+        'Segment type: ' + e.features[0].properties.SEGMENTNAM 
+      )
+      .addTo(map);
+  });
 
   // Point of interests on click
 
